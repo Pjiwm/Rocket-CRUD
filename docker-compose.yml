@@ -1,0 +1,42 @@
+# verion: "3.8"
+services:
+  rust:
+    container_name: rocket
+    links:
+      - 'postgres'
+    ports:
+      - 8080:8080
+    tty: true
+    build: .
+    volumes:
+      - ./data/rust:/data/rust
+    env_file:
+      - .env
+    environment:
+      DB_CONNECTION: ${DB_CONNECTION}
+
+  postgres:
+    image: 'postgres:latest'
+    container_name: postgres
+    ports:
+      - 5432:5432
+    volumes:
+      - ./data/postgresql:/data/postgresql
+    environment:
+      - POSTGRES_USER=username
+      - POSTGRES_PASSWORD=password
+      - POSTGRES_DB=default_database
+
+  pgadmin:
+    image: dpage/pgadmin4:4.23
+    container_name: pgadmin
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@pgadmin.com
+      PGADMIN_DEFAULT_PASSWORD: password
+      PGADMIN_LISTEN_PORT: 80
+    ports:
+      - 15432:80
+    volumes:
+      - ./data/pgadmin:/data/pgadmin
+    depends_on:
+      - postgres
